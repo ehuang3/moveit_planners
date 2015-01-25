@@ -443,7 +443,7 @@ bool ompl_interface::ModelBasedPlanningContext::solve(planning_interface::Motion
   if (solve(request_.allowed_planning_time, request_.num_planning_attempts))
   {
     double ptime = getLastPlanTime();
-    if (simplify_solutions_ && ptime < request_.allowed_planning_time)
+    if (simplify_solutions_ && (ptime < request_.allowed_planning_time || request_.allowed_planning_time <= 0.0))
     {
       simplifySolution(request_.allowed_planning_time - ptime);
       ptime += getLastSimplifyTime();
@@ -482,7 +482,7 @@ bool ompl_interface::ModelBasedPlanningContext::solve(planning_interface::Motion
     getSolutionPath(*res.trajectory_.back());
 
     // simplify solution if time remains
-    if (simplify_solutions_ && ptime < request_.allowed_planning_time)
+    if (simplify_solutions_ && (ptime < request_.allowed_planning_time || request_.allowed_planning_time <= 0.0))
     {
       simplifySolution(request_.allowed_planning_time - ptime);
       res.processing_time_.push_back(getLastSimplifyTime());
@@ -520,7 +520,16 @@ bool ompl_interface::ModelBasedPlanningContext::solve(double timeout, unsigned i
   preSolve();
 
   bool result = false;
-  if (count <= 1)
+  if (timeout <= 0.0 && count <= 1)
+  {
+    logDebug("%s: Solving the planning problem once without timeout...", name_.c_str());
+    ob::PlannerTerminationCondition ptc = ob::plannerNonTerminatingCondition();
+    registerTerminationCondition(ptc);
+    result = ompl_simple_setup_->solve(ptc) == ompl::base::PlannerStatus::EXACT_SOLUTION;
+    last_plan_time_ = ompl_simple_setup_->getLastPlanComputationTime();
+    unregisterTerminationCondition();
+  }
+  else if (count <= 1)
   {
     logDebug("%s: Solving the planning problem once...", name_.c_str());
     ob::PlannerTerminationCondition ptc = ob::timedPlannerTerminationCondition(timeout - ompl::time::seconds(ompl::time::now() - start));

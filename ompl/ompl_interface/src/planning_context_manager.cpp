@@ -216,7 +216,7 @@ ompl_interface::ModelBasedPlanningContextPtr ompl_interface::PlanningContextMana
   // Create a new planning context
   if (!context)
   {
-    ModelBasedStateSpaceSpecification space_spec(kmodel_, config.group);
+    ModelBasedStateSpaceSpecification space_spec(kmodel_, config.group, req);
     ModelBasedPlanningContextSpecification context_spec;
     context_spec.config_ = config.config;
     context_spec.planner_selector_ = getPlannerSelector();
@@ -239,7 +239,7 @@ ompl_interface::ModelBasedPlanningContextPtr ompl_interface::PlanningContextMana
         const ompl_interface::ModelBasedStateSpaceFactoryPtr &sub_fact = factory_selector(*beg);
         if (sub_fact)
         {
-          ModelBasedStateSpaceSpecification sub_space_spec(kmodel_, *beg);
+          ModelBasedStateSpaceSpecification sub_space_spec(kmodel_, *beg, req);
           context_spec.subspaces_.push_back(sub_fact->getNewStateSpace(sub_space_spec));
         }
       }

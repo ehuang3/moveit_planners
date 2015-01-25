@@ -11,6 +11,11 @@ add_library(${MOVEIT_LIB_NAME}
   src/parameterization/joint_space/joint_model_state_space_factory.cpp  
   src/parameterization/work_space/pose_model_state_space.cpp  
   src/parameterization/work_space/pose_model_state_space_factory.cpp
+  src/parameterization/action_space/action_based_state_type.cpp
+  src/parameterization/action_space/action_based_state_sampler.cpp
+  src/parameterization/action_space/action_based_state_space.cpp
+  src/parameterization/action_space/action_based_state_space_virtual.cpp
+  src/parameterization/action_space/action_based_state_space_factory.cpp
   src/detail/threadsafe_state_storage.cpp
   src/detail/state_validity_checker.cpp
   src/detail/projection_evaluators.cpp

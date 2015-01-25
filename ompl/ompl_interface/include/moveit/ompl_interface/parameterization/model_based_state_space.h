@@ -42,6 +42,7 @@
 #include <moveit/robot_state/robot_state.h>
 #include <moveit/kinematic_constraints/kinematic_constraint.h>
 #include <moveit/constraint_samplers/constraint_sampler.h>
+#include <moveit_msgs/MotionPlanRequest.h>
 
 namespace ompl_interface
 {
@@ -52,16 +53,20 @@ typedef boost::function<double(const ompl::base::State *state1, const ompl::base
 struct ModelBasedStateSpaceSpecification
 {
   ModelBasedStateSpaceSpecification(const robot_model::RobotModelConstPtr &robot_model,
-                                    const robot_model::JointModelGroup *jmg)
+                                    const robot_model::JointModelGroup *jmg,
+                                    const moveit_msgs::MotionPlanRequest &req)
     : robot_model_(robot_model)
     , joint_model_group_(jmg)
+    , req_(req)
   {
   }
 
   ModelBasedStateSpaceSpecification(const robot_model::RobotModelConstPtr &robot_model,
-                                    const std::string &group_name) 
+                                    const std::string &group_name,
+                                    const moveit_msgs::MotionPlanRequest &req)
     : robot_model_(robot_model)
     , joint_model_group_(robot_model_->getJointModelGroup(group_name))
+    , req_(req)
   {
     if (!joint_model_group_)
       throw std::runtime_error("Group '" + group_name + "'  was not found");
@@ -69,7 +74,8 @@ struct ModelBasedStateSpaceSpecification
 
   robot_model::RobotModelConstPtr robot_model_;
   const robot_model::JointModelGroup *joint_model_group_;
-  robot_model::JointBoundsVector joint_bounds_; 
+  robot_model::JointBoundsVector joint_bounds_;
+  const moveit_msgs::MotionPlanRequest req_;
 };
 
 class ModelBasedStateSpace : public ompl::base::StateSpace
